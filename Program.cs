@@ -1,7 +1,28 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+// ADD THESE TWO (Replace with your actual project name)
+using OnlineTicketManagementSystem.Data; 
+using OnlineTicketManagementSystem.Models; 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<ApplicationUser,IdentityRole>(
+    options => {
+        options.Password.RequireNonAlphanumeric=true;
+        options.Password.RequiredLength=8;
+        options.Password.RequireUppercase=true;
+        options.Password.RequireLowercase=true;
+        options.User.RequireUniqueEmail=true ;
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedEmail = true;
+    }).AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 
 var app = builder.Build();
 
@@ -15,7 +36,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-
 namespace OnlineTicketManagementSystem.Models
 {
     public class ApplicationUser : IdentityUser

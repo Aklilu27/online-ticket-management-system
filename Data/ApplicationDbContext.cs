@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OnlineTicketManagementSystem.Models;
-
 namespace OnlineTicketManagementSystem.Data
 {
     // Inheriting from IdentityDbContext adds AspNetUsers, AspNetRoles, etc.
