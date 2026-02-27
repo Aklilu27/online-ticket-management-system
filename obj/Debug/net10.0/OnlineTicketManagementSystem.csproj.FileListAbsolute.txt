@@ -288,3 +288,4 @@ d:\OnlineTicketManagementSystem\obj\Debug\net10.0\refint\OnlineTicketManagementS
 d:\OnlineTicketManagementSystem\obj\Debug\net10.0\OnlineTicketManagementSystem.pdb
 d:\OnlineTicketManagementSystem\obj\Debug\net10.0\OnlineTicketManagementSystem.genruntimeconfig.cache
 d:\OnlineTicketManagementSystem\obj\Debug\net10.0\ref\OnlineTicketManagementSystem.dll
+D:\OnlineTicketManagementSystem\obj\Debug\net10.0\compressed\whnssb9nsw-{0}-81hlqo8he8-81hlqo8he8.gz

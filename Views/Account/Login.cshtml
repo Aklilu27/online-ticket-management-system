@@ -1,1 +1,37 @@
-<h1>Login page</h1>
+@using OnlineTicketManagementSystem.ViewModels
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+ 
+ <div class="account-container">
+    <div class="account-box">
+        <h2 class="text-center mb-4">Login</h2>
+
+        <form asp-action="Login" method="post">
+            <div  asp-validation-summary="ModelOnly" class=" text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+              </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-check mb-3">
+                <label asp-for="RememberMe" class="form-check-label">
+                <input asp-for="RememberMe" class="form-check-input" />
+                @Html.DisplayNameFor(m => m.RememberMe)
+                </label>
+            </div>
+            <input type="submit" value="LOGIN" class="btn btn-success w-100 p-2" />
+            <div class="text-center mt-3">
+                <a  asp-controller="Home" asp-action="Index" class="text-decoration-none mt-3 ">Back</a>
+
+            </div>
+        </form>
+    </div>
+ </div>
