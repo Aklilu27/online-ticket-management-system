@@ -1,13 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "VYK2SYA3lAI=",
+  "dgSpecHash": "gQW/iCr5pU0=",
   "success": true,
   "projectFilePath": "D:\\OnlineTicketManagementSystem\\OnlineTicketManagementSystem.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
-    "C:\\Users\\Aklilu Abera\\.nuget\\packages\\microsoft.aspnetcore.authentication.cookies\\2.3.9\\microsoft.aspnetcore.authentication.cookies.2.3.9.nupkg.sha512",
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\10.0.3\\microsoft.aspnetcore.identity.entityframeworkcore.10.0.3.nupkg.sha512",
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\microsoft.aspnetcore.identity.ui\\10.0.3\\microsoft.aspnetcore.identity.ui.10.0.3.nupkg.sha512",
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\8.0.0\\microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
@@ -56,18 +55,5 @@
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.4\\system.security.cryptography.pkcs.9.0.4.nupkg.sha512",
     "C:\\Users\\Aklilu Abera\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.4\\system.security.cryptography.protecteddata.9.0.4.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "message": "PackageReference Microsoft.AspNetCore.Authentication.Cookies will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "D:\\OnlineTicketManagementSystem\\OnlineTicketManagementSystem.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\OnlineTicketManagementSystem\\OnlineTicketManagementSystem.csproj",
-      "libraryId": "Microsoft.AspNetCore.Authentication.Cookies",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }

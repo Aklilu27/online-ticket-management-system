@@ -1,16 +1,21 @@
 @using OnlineTicketManagementSystem.ViewModels
-@model LoginViewModel
+@model RegisterViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Register";
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
 }
  
  <div class="account-container">
     <div class="account-box">
-        <h2 class="text-center mb-4">Login</h2>
+        <h2 class="text-center mb-4">Register</h2>
 
-        <form asp-action="Login" method="post">
+        <form asp-action="Register" method="post">
             <div  asp-validation-summary="ModelOnly" class=" text-danger"></div>
+                <div class="mb-3">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+              </div>
             <div class="mb-3">
                 <label asp-for="Email" class="control-label"></label>
                 <input asp-for="Email" class="form-control" />
@@ -21,24 +26,15 @@
                 <input asp-for="Password" type="password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <div class="float-end">
-                <a asp-controller="Account" asp-action="VerifyEmail" class="text-decoration-none">Forgot Password ?</a>
+             <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="form-check mb-3">
-                <label asp-for="RememberMe" class="form-check-label">
-                <input asp-for="RememberMe" class="form-check-input" />
-                @Html.DisplayNameFor(m => m.RememberMe)
-                </label>
-            </div>
-            <input type="submit" value="LOGIN" class="btn btn-success w-100 p-2" />
+            <input type="submit" value="REGISTER" class="btn btn-success w-100 p-2 mt-3" />
             <div class="text-center mt-3 ">
                 <a  asp-controller="Home" asp-action="Index" class="text-decoration-none mt-3 ">Back</a>
             </div>
         </form>
     </div>
  </div>
- @section Scripts {
-   @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
-    }
-}
