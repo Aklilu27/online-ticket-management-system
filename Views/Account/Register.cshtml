@@ -22,6 +22,20 @@
                 <span asp-validation-for="Email" class="text-danger"></span>
               </div>
             <div class="mb-3">
+                <label asp-for="CompanyId" class="control-label"></label>
+                <select asp-for="CompanyId" asp-items="ViewBag.Companies" class="form-select">
+                    <option value="">-- Select Company --</option>
+                </select>
+                <span asp-validation-for="CompanyId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="RoleId" class="control-label"></label>
+                <select asp-for="RoleId" asp-items="ViewBag.Roles" class="form-select">
+                    <option value="">-- Select Role --</option>
+                </select>
+                <span asp-validation-for="RoleId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" type="password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
@@ -38,3 +52,9 @@
         </form>
     </div>
  </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+    }
+}

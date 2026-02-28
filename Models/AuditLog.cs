@@ -1,10 +1,23 @@
 namespace OnlineTicketManagementSystem.Models
 {
-    public class AuditLog
+  public class AuditLog
     {
-        public int Id { get; set; }
-        public string Action { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
-        public string UserId { get; set; } = string.Empty;
+        public int LogId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Action { get; set; }
+
+        public string EntityType { get; set; }
+
+        public int EntityId { get; set; }
+
+        public string OldValue { get; set; }
+
+        public string NewValue { get; set; }
+
+        public string IPAddress { get; set; }
+
+        public DateTime TimeStamp { get; set; } = DateTime.Now;
     }
 }

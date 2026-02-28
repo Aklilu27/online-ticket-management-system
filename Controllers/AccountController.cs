@@ -1,166 +1,263 @@
-
-using Microsoft.AspNetCore.Mvc;
-using OnlineTicketManagementSystem.ViewModels;
-using OnlineTicketManagementSystem.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using OnlineTicketManagementSystem.Models;
+using OnlineTicketManagementSystem.ViewModels;
+
 namespace OnlineTicketManagementSystem.Controllers
 {
+    public class AccountController : Controller
+    {
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
+        private readonly ApplicationDbContext _dbContext;
 
+        public AccountController(
+            SignInManager<User> signInManager,
+            UserManager<User> userManager,
+            RoleManager<Role> roleManager,
+            ApplicationDbContext dbContext)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _dbContext = dbContext;
+        }
 
-      public class AccountController : Controller
-      {
-            private readonly SignInManager<ApplicationUser> _signInManager;
-            private readonly UserManager<ApplicationUser> _userManager;
+        // =============================
+        // LOGIN PAGE
+        // =============================
 
-            public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
             {
-                  _signInManager = signInManager;
-                  _userManager = userManager;
-            }
-            public IActionResult Login()
-            {
-                  return View();
-            }
-            [HttpPost]
-            public async Task<IActionResult> Login(LoginViewModel model)
-            {
-                  if (ModelState.IsValid)
-                  {
-                        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                        if (result.Succeeded)
-                        {
-                              return RedirectToAction("Index", "Home");
-                        }
-                        else
-                        {
-                              ModelState.AddModelError("", "Invalid login attempt. weather email or password is incorrect.");
-                              return View(model);
-                        }
-                  }
-                  return View(model);
-            }
-            public IActionResult Register()
-            {
-                  return View();
-            }
-
-            [HttpPost]
-            public async Task<IActionResult> Register(RegisterViewModel model)
-            {
-                  if (ModelState.IsValid)
-                  {
-                        ApplicationUser applicationUsers = new ApplicationUser
-                        {
-
-                              FullName = model.FullName,
-                              Email = model.Email,
-                              UserName = model.Email
-                        };
-                        var result = await _userManager.CreateAsync(applicationUsers, model.Password);
-                        // Perform registration logic here (e.g., save user to database)
-                        // For demonstration purposes, we'll just redirect to the login page
-                        if (result.Succeeded)
-                        {
-                              return RedirectToAction("Login", "Account");
-                        }
-                        else
-                        {
-                              foreach (var error in result.Errors)
-                              {
-                                    ModelState.AddModelError("", error.Description);
-                              }
-                              // If we got this far, something failed; redisplay form
-                              return View(model);
-                        }
-
-                  }
-                  // If ModelState is not valid, redisplay the form with validation errors
-                  return View(model);
+                ModelState.AddModelError("", "Invalid email or password");
+                return View(model);
             }
 
-
-
-            public IActionResult VerifyEmail()
+            if (!user.IsActive)
             {
-                  return View();
-            }
-            [HttpPost]
-            public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
-            {
-                  if (ModelState.IsValid)
-                  {
-                        var user = await _userManager.FindByEmailAsync(model.Email);
-                        if (user == null)
-                        {
-                              ModelState.AddModelError("", "No user found with the provided email.");
-                              return View(model);
-                        }
-                        else
-                        {
-                              // Perform verification logic here
-                              return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
-
-                        }
-
-                  }
-
-                  return View(model);
-            }
-            public IActionResult ChangePassword(string username)
-
-            {
-                  if (string.IsNullOrEmpty(username))
-                  {
-                        return RedirectToAction("VerifyEmail", "Account");
-                  }
-                  return View(new ChangePasswordViewModel { Email = username });
+                ModelState.AddModelError("", "Account is disabled");
+                return View(model);
             }
 
-            [HttpPost]
-            public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+            var result = await _signInManager.PasswordSignInAsync(
+                user,
+                model.Password,
+                model.RememberMe,
+                true
+            );
+
+            if (result.Succeeded)
             {
-                  if (ModelState.IsValid)
-                  {
-                        var user = await _userManager.FindByNameAsync(model.Email);
-                        if (user != null)
-                        {
-                              var result = await _userManager.RemovePasswordAsync(user);
-                              if (result.Succeeded)
-                              {
-                                    result = await _userManager.AddPasswordAsync(user, model.NewPassword);
-                                    return RedirectToAction("Login", "Account");
-                              }
-                              else
-                              {
-                                    foreach (var error in result.Errors)
-                                    {
-                                          ModelState.AddModelError("", error.Description);
-                                    }
-                                    return View(model);
-                              }
-                        }
-                        else
-                        {
-                              ModelState.AddModelError("", "email is not found");
-                              return View(model);
-                        }
-                  }
-                  else
-                  {
-                        ModelState.AddModelError("", "Something went wrong.");
-                        return View(model);
-                  }
+                user.LastLoginAt = DateTime.Now;
+                user.FailedLoginAttempts = 0;
+                user.LockoutUntil = null;
+                await _userManager.UpdateAsync(user);
+
+                // Force password change (Documentation rule)
+                if (user.MustChangePassword)
+                {
+                    return RedirectToAction("ChangePassword", new { email = user.Email });
+                }
+
+                return RedirectToAction("Index", "Home");
             }
-            
-             [HttpPost]
+
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelError("", "Your account is temporarily locked. Please try again later.");
+                return View(model);
+            }
+
+            user.FailedLoginAttempts += 1;
+            if (user.FailedLoginAttempts >= 5)
+            {
+                user.LockoutUntil = DateTime.Now.AddMinutes(15);
+            }
+
+            await _userManager.UpdateAsync(user);
+
+            ModelState.AddModelError("", "Invalid login attempt");
+            return View(model);
+        }
+
+        // =============================
+        // REGISTER USER (ADMIN ONLY)
+        // =============================
+
+        public async Task<IActionResult> Register()
+        {
+            await LoadRegisterLookupsAsync();
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadRegisterLookupsAsync();
+                return View(model);
+            }
+
+            var selectedRole = await _roleManager.Roles
+                .FirstOrDefaultAsync(r => r.Id == model.RoleId);
+
+            if (selectedRole == null)
+            {
+                ModelState.AddModelError(nameof(model.RoleId), "Selected role is invalid.");
+                await LoadRegisterLookupsAsync();
+                return View(model);
+            }
+
+            var user = new User
+            {
+                FullName = model.FullName,
+                Email = model.Email,
+                UserName = model.Email,
+                CompanyId = model.CompanyId,
+                EmailConfirmed = true,
+                LockoutEnabled = true,
+                FailedLoginAttempts = 0,
+                MustChangePassword = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, selectedRole.Name!);
+                return RedirectToAction("Login");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            await LoadRegisterLookupsAsync();
+
+            return View(model);
+        }
+
+        // =============================
+        // VERIFY EMAIL
+        // =============================
+
+        public IActionResult VerifyEmail()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Email not found");
+                return View(model);
+            }
+
+            if (!user.IsActive)
+            {
+                ModelState.AddModelError("", "Account is disabled");
+                return View(model);
+            }
+
+            return RedirectToAction("ChangePassword", new { email = user.Email });
+        }
+
+        // =============================
+        // CHANGE PASSWORD
+        // =============================
+
+        public IActionResult ChangePassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return RedirectToAction("Login");
+
+            return View(new ChangePasswordViewModel { Email = email });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "User not found");
+                return View(model);
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                user.MustChangePassword = false;
+                user.FailedLoginAttempts = 0;
+                user.LockoutUntil = null;
+                await _userManager.UpdateAsync(user);
+
+                return RedirectToAction("Login");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(model);
+        }
+
+        // =============================
+        // LOGOUT
+        // =============================
+
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
         }
 
-      }
+        private async Task LoadRegisterLookupsAsync()
+        {
+            var companies = await _dbContext.Companies
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            var roles = await _roleManager.Roles
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            ViewBag.Companies = new SelectList(companies, "Id", "Name");
+            ViewBag.Roles = new SelectList(roles, "Id", "Name");
+        }
+    }
 }
-
-
